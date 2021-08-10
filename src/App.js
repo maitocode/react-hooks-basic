@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.scss";
 import Pagination from "./components/Pagination/index.jsx";
+import PostFiltersForm from "./components/PostFiltersForm/index.jsx";
 import PostList from "./components/PostList/index.jsx";
 
 import TodoForm from "./components/TodoForm/index.jsx";
@@ -19,15 +20,16 @@ function App() {
     _limit: 10,
     _totalRows: 11,
   });
-  const [filters, setFilter] = useState({
+  const [filters, setFilters] = useState({
     _limit: 10,
     _page: 1,
+    title_like: "quis",
   });
 
   useEffect(() => {
     async function fetchPostList() {
       try {
-        const requestUrl = `http://js-post-api.herokuapp.com/api/posts?limit=${filters._limit}&_page=${filters._page}`;
+        const requestUrl = `http://js-post-api.herokuapp.com/api/posts?limit=${filters._limit}&_page=${filters._page}&title_like=${filters.title_like}`;
         const response = await fetch(requestUrl);
         const responseJSON = await response.json();
         console.log({ responseJSON });
@@ -44,7 +46,7 @@ function App() {
 
   function handlePageChange(newPage) {
     console.log("New page: ", newPage);
-    setFilter({
+    setFilters({
       ...filters,
       _page: newPage,
     });
@@ -73,12 +75,22 @@ function App() {
     setTodoList(newTodoList);
   }
 
+  function handleFiltersChange(newFilters) {
+    console.log("New filters: ", newFilters);
+    setFilters({
+      ...filters,
+      _page: 1,
+      title_like: newFilters.searchTerm,
+    });
+  }
+
   return (
     <div className="app">
       <h1>React Hooks - To do list</h1>
       {/* <TodoForm onSubmit={handleTodoFormSubmit} />
       <TodoList todos={todoList} onTodoClick={handleTodoClick} /> */}
 
+      <PostFiltersForm onSubmit={handleFiltersChange} />
       <PostList posts={postList} />
       <Pagination pagination={pagination} onPageChange={handlePageChange} />
     </div>
